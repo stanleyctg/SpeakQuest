@@ -1,11 +1,14 @@
-function App() {
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Practice from "./pages/Practice";
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Welcome to My App</h1>
-        <p>This is a simple React application.</p>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/practice" replace />} />
+        <Route path="/practice" element={<Practice />} />
+        {/* <Route path="/stats" element={<Stats />} /> */}
+      </Routes>
+    </BrowserRouter>
   );
 }
-export default App;
