@@ -5,7 +5,7 @@ const placeholderQuestions: string[] = [
     "Tell me about yourself.",
     "Why are you interested in this role?",
     "What are your strengths?",
-    "Describe a challenge you faced and how you overcame it.",
+    "Describe a challenge you facedxxxxxxxxxxxx xxxxxxxxxxxxx xxxxxxx and how you overcame it.",
     "Where do you see yourself in 5 years?",
 ]as const;
 

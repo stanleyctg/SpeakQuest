@@ -4,7 +4,7 @@ import Button from './Button';
 
 // Define the video constraints for webcam
 const VIDEO_CONSTRAINTS: MediaTrackConstraints = {
-  width: 780,
+  width: 940,
   height: 640,
 } as const;
 
@@ -13,7 +13,7 @@ export default function Camera() {
     const webcamRef = useRef<Webcam | null>(null);
 
 
-      // Check media permissions
+    // Check media permissions
     async function checkPermission() {
         let stream: MediaStream | null = null;
         try {
@@ -41,7 +41,6 @@ export default function Camera() {
 
     return (
         <div>
-        <h1>Live Capture</h1>
         {permission === false ? (
             <p>
             Please allow access to your camera and microphone to use this feature.
@@ -60,8 +59,8 @@ export default function Camera() {
 
             <div>
                 <Button
-                    onClick={() => {void webcamRef.current?.getScreenshot()}}
-                    children="Capture Screenshot"
+                    onClick={() => {console.log("Starting...")}}
+                    children="Start/Stop Recording"
                 />                
             </div>
 

@@ -1,0 +1,47 @@
+.practice-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  align-items: stretch;
+  gap: 5px;
+  padding: 30px;
+  margin-right: 10px;
+}
+
+.right-pane {
+    display: flex;
+}
+
+.left-pane {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    padding-left: 15%;
+    min-height: 85vh;
+}
+
+/* ================================
+   RESPONSIVE: small‐screen tweaks
+   ================================ */
+@media (max-width: 1440px) {
+  .practice-container {
+    flex-direction: column;  /* stack vertically */
+    padding: 20px;           /* tighten up the gutters */
+  }
+
+  .left-pane,
+  .right-pane {
+    /* full width of container */
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-left: 0;         /* remove the big left indent */
+  }
+
+  .right-pane {
+    margin-top: 1rem;        /* spacing between stacked panes */
+    border-left: none;       /* you can add a top border if you like */
+    border-top: 1px solid #8394a9;
+  }
+}
