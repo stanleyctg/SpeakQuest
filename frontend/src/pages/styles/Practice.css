@@ -1,5 +1,6 @@
 * {
   background-color: #cec4c4;
+  overflow: hidden;
 }
 
 .practice-container {
@@ -19,9 +20,9 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  justify-content: space-between;
-  padding-left: 16%;
-  min-height: 85vh;
+  gap: 100px;
+  padding-left: 10%;
+  overflow: hidden;
 }
 
 /* ================================

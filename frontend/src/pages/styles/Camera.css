@@ -4,13 +4,16 @@
   align-items: stretch;
   padding: 20px;
   overflow: visible;
-  position: relative;
-  top: -25px;
+  margin-top: -25px;
 }
 
 .webcam-container {
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.webcam-container video {
+  border-radius: 20px;
 }
 
 .button-container {
@@ -19,9 +22,10 @@
 
 .button-container button {
   flex: 1 1 auto;
+  border-radius: 10px;
   height: 2rem;
   color: #ffffff;
-  background-color: #f94444;
+  background-color: #911111;
   font-size: large;
 }
 
