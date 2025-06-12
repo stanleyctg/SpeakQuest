@@ -1,27 +1,30 @@
-import React, { useState } from 'react';
-import Button from './Button';
-
-const placeholderQuestions: string[] = [
-    "Tell me about yourself.",
-    "Why are you interested in this role?",
-    "What are your strengths?",
-    "Describe a challenge you facedxxxxxxxxxxxx xxxxxxxxxxxxx xxxxxxx and how you overcame it.",
-    "Where do you see yourself in 5 years?",
-]as const;
+import React, { useEffect, useState } from "react";
+import Button from "./Button";
+import { questions, type Question } from "../data/Question";
 
 export default function Questions() {
-    const [questionIdx, setQuestionIdx] = useState<number>(0);
+  const [questionIdx, setQuestionIdx] = useState<number>(0);
+  const q: Question = questions[questionIdx];
 
-    return(
-        <div>
-            <h1>Questions</h1>
-            <p>{placeholderQuestions[questionIdx]}</p>
-            <Button
-                onClick={() => setQuestionIdx((prev) => (prev + 1) % placeholderQuestions.length)}
-                children="Next Question"
-            />
+  const next = () => setQuestionIdx((prev) => (prev + 1) % questions.length);
 
+  return (
+    <div>
+      <div>
+        <h1>Question</h1>
+        <p>{q.question}</p>
+      </div>
 
-        </div>
-    )
+      <div>
+        <h2>Key points to consider</h2>
+        <ul>
+          {q.prompts.map((prompt, idx) => (
+            <li key={idx}>{prompt}</li>
+          ))}
+        </ul>
+      </div>
+
+      <Button onClick={next} children="Next Question" />
+    </div>
+  );
 }
