@@ -1,0 +1,51 @@
+.question-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.question {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+  white-space: normal; /* allow wrapping on spaces */
+  overflow-wrap: break-word;
+  max-width: 20ch;
+  width: 100%;
+}
+
+.prompts {
+  display: flex;
+  flex-direction: column;
+  font-size: larger;
+  position: relative;
+  margin-top: -20px;
+}
+
+.prompts-list {
+  list-style: square inside;
+  padding-left: 1.2em;
+  padding: 10px;
+  margin-top: -10px;
+}
+
+.prompts-list li {
+  max-width: 40ch;
+  overflow-wrap: break-word;
+  padding: 5px;
+  font-size: large;
+}
+
+.question-button-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.question-button-container button {
+  height: 2rem;
+  border-radius: 10px;
+  width: 10rem;
+  color: #ffffff;
+  background-color: #066109;
+  font-size: large;
+  margin-top: 10px;
+}
