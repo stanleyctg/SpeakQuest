@@ -10,9 +10,6 @@ export default function Practice() {
         <div>
           <Questions />
         </div>
-        <div>
-          <Captions />
-        </div>
       </div>
       <div className="right-pane">
         <Camera />

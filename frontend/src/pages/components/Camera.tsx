@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import Button from "./Button";
 import "./../styles/Camera.css";
+import Microphone from "./Microphone";
+import { Mic } from "lucide-react";
 
 // Define the video constraints for webcam
 const VIDEO_CONSTRAINTS: MediaTrackConstraints = {
@@ -62,12 +64,7 @@ export default function Camera() {
           </div>
 
           <div className="button-container">
-            <Button
-              onClick={() => {
-                console.log("Starting...");
-              }}
-              children="Start/Stop Recording"
-            />
+            <Microphone />
           </div>
         </>
       )}
