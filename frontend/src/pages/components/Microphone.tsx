@@ -4,7 +4,21 @@ import { AudioRecorder } from "react-audio-voice-recorder";
 export default function Microphone() {
   // Function to handle the completion of audio recording
   const saveAudioFile = async (data: Blob) => {
-    console.log("Audio file saved:", data);
+    const formData = new FormData();
+    formData.append("audio", data, "recording.webm");
+    try {
+      const response = await fetch("http://localhost:8000/api/upload-audio", {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) {
+        throw new Error("Failed to upload audio file");
+      }
+      const result = await response.json();
+      console.log("Audio file uploaded successfully:", result);
+    } catch (error) {
+      console.error("Error uploading audio file:", error);
+    }
   };
 
   return (
