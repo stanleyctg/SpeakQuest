@@ -7,7 +7,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["localhost:5173"],
+    allow_origins=["http://localhost:5173"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -31,10 +31,15 @@ async def upload_audio_file(audio: UploadFile = File(...)):
 async def feedback():
     # Get absolute path to recording
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    audio_path = os.path.join(base_dir, "..", "uploads", "recording.m4a")
+    audio_path = os.path.join(base_dir, "uploads", "recording.webm")
     audio_path = os.path.abspath(audio_path)
 
     audio_file = open(audio_path, "rb")
     transcription = speech_to_text(audio_file)
+
+    return {
+        "transcription": transcription,
+        "audio_path": audio_path
+    }
 
     # Wire this transcript to chatgpt service then return the response

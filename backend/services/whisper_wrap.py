@@ -13,4 +13,4 @@ def speech_to_text(audio_file):
         response_format="text"
     )
 
-    return transcription.text
+    return transcription
