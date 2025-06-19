@@ -16,8 +16,25 @@ export default function Microphone() {
       }
       const result = await response.json();
       console.log("Audio file uploaded successfully:", result);
+      getFeedback();
     } catch (error) {
       console.error("Error uploading audio file:", error);
+    }
+  };
+
+  const getFeedback = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/api/feedback", {
+        method: "POST",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to transcribe audio file");
+      }
+      const result = await response.json();
+      // console.log("Transcription result:", result.transcription);
+      return result.transcription;
+    } catch (error) {
+      console.error("Error transcribing audio file:", error);
     }
   };
 
