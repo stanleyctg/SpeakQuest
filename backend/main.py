@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from backend.services.whisper_wrap import speech_to_text 
+from backend.services import Services 
 
 app = FastAPI()
 
@@ -35,7 +35,9 @@ async def feedback():
     audio_path = os.path.abspath(audio_path)
 
     audio_file = open(audio_path, "rb")
-    transcription = speech_to_text(audio_file)
+
+    services = Services(audio_file)
+    transcription = services.speech_to_text()
 
     return {
         "transcription": transcription,

@@ -31,7 +31,7 @@ export default function Microphone() {
         throw new Error("Failed to transcribe audio file");
       }
       const result = await response.json();
-      // console.log("Transcription result:", result.transcription);
+      console.log("Transcription result:", result.transcription);
       return result.transcription;
     } catch (error) {
       console.error("Error transcribing audio file:", error);
