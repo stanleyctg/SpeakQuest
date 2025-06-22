@@ -63,9 +63,7 @@ export default function Camera() {
             />
           </div>
 
-          <div className="button-container">
-            <Microphone />
-          </div>
+          <div className="button-container">{/* <Microphone /> */}</div>
         </>
       )}
     </div>
