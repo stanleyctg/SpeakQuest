@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Button from "./Button";
 import { questions, type Question } from "../data/Question";
 import "./../styles/Question.css";
+import Microphone from "./Microphone";
 
 export default function Questions() {
   const [questionIdx, setQuestionIdx] = useState<number>(0);
@@ -14,7 +15,6 @@ export default function Questions() {
       <div className="question">
         <p>{q.question}</p>
       </div>
-
       <div className="prompts">
         <p>Key points to consider: </p>
         <ul className="prompts-list">
@@ -23,8 +23,9 @@ export default function Questions() {
           ))}
         </ul>
       </div>
+      <Microphone question={q.question} onNext={next} />{" "}
       <div className="question-button-container">
-        <Button onClick={next} children="Next Question" />
+        <Button onClick={next} children="Skip Question" />{" "}
       </div>
     </div>
   );
