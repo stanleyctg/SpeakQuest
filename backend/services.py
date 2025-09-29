@@ -1,56 +1,133 @@
-from openai import OpenAI
+from __future__ import annotations
+
 import os
-from backend.config import load_config_from_env
+from dataclasses import dataclass
+from typing import Optional, Union
 
+from openai import OpenAI
+from pydantic import BaseModel, Field, ValidationError
+
+# Configure OpenAI client here or via environment variables
+def get_openai_client(api_key: Optional[str] = None) -> OpenAI:
+    key = api_key or os.getenv("OPENAI_API_KEY")
+    if not key:
+        raise RuntimeError("OPENAI_API_KEY is not set.")
+    return OpenAI(api_key=key)
+
+
+# Data model for the review result
+class ReviewResult(BaseModel):
+    rating: float = Field(..., ge=0, le=10)
+    feedback: str
+    slight_opt: str = Field(alias="slightly_optimized_version")
+    improve_points: str = Field(alias="how_to_make_it_stronger")
+    opt_with_placeholders: str
+    summary: str
+
+# AI prompt
+BASE_INSTRUCTIONS = (
+    "You are a strict recruiter assessing software engineering interview answers. "
+    "Be direct, concise, and specific. Point out inaccuracies plainly. Avoid profanity. "
+    "Only expand on what was said; do not invent new facts unless asked to propose improvements."
+)
+
+# Prompt builder
+def build_review_prompt(question: str, transcript: str) -> str:
+    return f"""
+            {BASE_INSTRUCTIONS}
+
+            Question: {question}
+
+            Transcript:
+            {transcript}
+
+            Return your analysis **as JSON** with these exact keys:
+            - rating (0-10 number)
+            - feedback (string)
+            - slightly_optimized_version (string)  # expand only what's there; no new facts
+            - how_to_make_it_stronger (string)     # what else to add (tech, metrics, names...)
+            - opt_with_placeholders (string)       # a rewritten version including those additions with [PLACEHOLDER]s
+            - summary (string)
+            If there is no answer in the transcript, return:
+            {{
+            "rating": 0,
+            "feedback": "No answer provided.",
+            "slightly_optimized_version": "",
+            "how_to_make_it_stronger": "",
+            "opt_with_placeholders": "",
+            "summary": "No answer provided."
+            }}
+        """.strip()
+
+
+# Service wrapper
+@dataclass
 class Services:
-    def __init__(self, audio_file):
-        load_config_from_env()
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.audio_file = audio_file
-        self.transcription = None
+    client: OpenAI
+    audio_source: Optional[Union[str, bytes]] = None  # path or bytes
+    transcription: Optional[str] = None
 
-    def speech_to_text(self):
-        load_config_from_env()
-        if not self.audio_file:
-            raise ValueError("No audio file provided")
-        transcription = self.client.audio.transcriptions.create(
-            model="gpt-4o-transcribe", 
-            file=self.audio_file,
-            response_format="text"
-        )
-        if transcription:
-            self.transcription = transcription
-        return transcription
-    
-    def transcript_to_chatgpt(self, question):
+    def speech_to_text(
+        self,
+        model: str = "gpt-4o-transcribe",
+        response_format: str = "text",
+    ) -> str:
+        if not self.audio_source:
+            raise ValueError("No audio file provided.")
+
+        # Handle file input
+        if isinstance(self.audio_source, str):
+            with open(self.audio_source, "rb") as f:
+                transcription = self.client.audio.transcriptions.create(
+                    model=model,
+                    file=f,
+                    response_format=response_format,
+                )
+        else:
+            transcription = self.client.audio.transcriptions.create(
+                model=model,
+                file=self.audio_source,
+                response_format=response_format,
+            )
+
+        if not transcription:
+            raise RuntimeError("Empty transcription response from API.")
+
+        # Store and return the transcription text
+        self.transcription = str(transcription)
+        return self.transcription
+
+    def transcript_to_chatgpt(
+        self,
+        question: str,
+        model: str = "gpt-4.1",
+        temperature: float = 0.2,
+    ) -> ReviewResult:
+
         if not self.transcription:
-            raise ValueError("No transcription available")
+            raise ValueError("No transcription available. Run speech_to_text() first.")
 
-        message = f"""Imagine you are a recruiter for top companies, hiring software engineering graduates to join your software engineering graduate schemes.
-        Your company are looking for the best candidates so their interview answer must be crisp, to the point, detailed, and have done their research.
-        Be very strict in your marking and give comprehensive feedback (no fluff straight to the point) Call out on bullshit or things that make no sense Dont be afraid to use some cuss words to get ur points across cause this is how I learn.
-        Given the quesiton {question} and the transcript {self.transcription}
-        
-        rate this answer out of 10 then give feedback then an optimised version of the answer
-        forget any memories u had in the past for this, new candidate, optimised answer should not change the meaning of things or include things that were not said. Just expand on things.
+        prompt = build_review_prompt(question=question, transcript=self.transcription)
 
-        But one thing to note is to tell candidate what they couldve add, like maybe more technologies, explain more on things or talk about others.
-        So with that aid give another optimised version where if the candidate do so, and add placeholder if there are some personal names
-
-        If there is no answer, just say "No answer provided".
-
-        Here how you should format your response:
-        1) Rating: [rating out of 10]
-        2) Feedback: [detailed feedback on the answer]
-        3) Slightly Optimised Version (only expanding existing info, no added facts):
-        4) How to Make it Stronger (What you should’ve added):
-        5) Optimised Version With Placeholders (if you had added those points)
-        6) Summary
-        """
-
-        response = self.client.responses.create(
-            model="gpt-4.1",
-            input=message
+        # Call OpenAI chat endpoint
+        resp = self.client.responses.create(
+            model=model,
+            input=prompt,
+            temperature=temperature,
+            response_format={"type": "json_object"},
         )
 
-        return response.output_text
+        # Extract content from response
+        try:
+            content = resp.output[0].content[0].text
+        except Exception:
+            # Fallback for clients that expose .output_text
+            content = getattr(resp, "output_text", None)
+
+        if not content:
+            raise RuntimeError("No content returned by the model.")
+
+        try:
+            return ReviewResult.model_validate_json(content)
+        except ValidationError as ve:
+            raise ValueError(f"Failed to parse model JSON: {ve}") from ve
