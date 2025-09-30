@@ -174,7 +174,7 @@ def test_speech_to_text_with_path_success(tmp_path, fake_client):
 
 
 def test_speech_to_text_with_bytes_success(fake_client):
-    # Provide raw bytes; current implementation passes bytes directly
+    # Raw bytes input
     audio_bytes = b"FAKEAUDIOBYTES"
     fake_client.audio.transcriptions.to_return = "OK TEXT"
 
@@ -185,7 +185,7 @@ def test_speech_to_text_with_bytes_success(fake_client):
     assert svc.transcription == "OK TEXT"
 
     kwargs = fake_client.audio.transcriptions.calls[-1]
-    assert kwargs["file"] == audio_bytes  # current code passes bytes
+    assert kwargs["file"] == audio_bytes
 
 
 def test_speech_to_text_raises_on_empty_response(fake_client, tmp_path):
@@ -210,7 +210,7 @@ def test_speech_to_text_should_extract_text_attr_when_sdk_returns_object(fake_cl
     svc = Services(client=fake_client, audio_source=str(audio_path))
     text = svc.speech_to_text()
 
-    # Desired behavior (will fail until implementation is fixed):
+    # Desired behavior (fail currently):
     assert text == "REAL TEXT"
     assert svc.transcription == "REAL TEXT"
 
@@ -236,7 +236,7 @@ def test_transcript_to_chatgpt_parses_nested_output_shape(fake_client, sample_re
     result = svc.transcript_to_chatgpt("What did you build?")
     assert isinstance(result, ReviewResult)
     assert result.rating == 7.5
-    assert result.slight_opt == "Slightly expanded as requested."  # alias resolved
+    assert result.slight_opt == "Slightly expanded as requested."
     assert result.improve_points == "Add tech, metrics, and outcomes."
 
     # Assert call captured prompt and params
